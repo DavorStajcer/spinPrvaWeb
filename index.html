@@ -24,17 +24,48 @@
 
 <script>
     var test = 25
-    console.log("Lol")
-    document.getElementsByClassName("title")
-    var table = document.getElementById("tablica")
-    var row = table.insertRow()
-    var cell = row.insertCell()
-    var cell2 = row.insertCell()
-    var cell3 = row.insertCell()
-    var cell4 = row.insertCell()
-    cell.innerHTML = "Smth"
-    cell2.innerHTML = "Smth2"
-    cell3.innerHTML = "Smth3"
-    cell4.innerHTML = "Smth4"
+    addTable()
+    var url = "https://jupitermobiletest.jupiter-software.com:30081/jupitermobilex/gen/api/food"
+    console.log()
+    fetchData().then({
+        console.log()
+    })
+   
+
+    async function fetchData(){
+        var response = await fetch(url,{
+        method : post,
+        body: JSON.stringify({
+            "queries" : [
+                {
+                    "query":"SpinCodeAcademy",
+                    "params" : {
+                        "action" : "getall",
+                        "userid" : 1
+                    }
+                }
+            ]
+        })
+
+    })
+    }
+
+
+
+    
+
+    function addTable (){
+        document.getElementsByClassName("title")
+        var table = document.getElementById("tablica")
+        var row = table.insertRow()
+        var cell = row.insertCell()
+        var cell2 = row.insertCell()
+        var cell3 = row.insertCell()
+        var cell4 = row.insertCell()
+        cell.innerHTML = "Smth"
+        cell2.innerHTML = "Smth2"
+        cell3.innerHTML = "Smth3"
+        cell4.innerHTML = "Smth4"
+    }
 </script>
 </html>
