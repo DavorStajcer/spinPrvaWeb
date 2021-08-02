@@ -26,15 +26,24 @@
     var test = 25
     addTable()
     var url = "https://jupitermobiletest.jupiter-software.com:30081/jupitermobilex/gen/api/food"
-    console.log()
-    fetchData().then({
-        console.log()
+    
+    fetchData().then(function (response){
+       if(response.ok)
+            return response.json()
+    }).then(function (dataList){
+
+        console.log(dataList)
+        document.getElementsByClassName("title")
+        var table = document.getElementById("tablica")     
+        for(var i = 0;i < Object.keys(dataList).length;i++){
+            addRow(table,dataList[i]["Term"],dataList[i]["Username"])
+        }
+            
     })
    
-
     async function fetchData(){
         var response = await fetch(url,{
-        method : post,
+        method : "POST",
         body: JSON.stringify({
             "queries" : [
                 {
@@ -45,9 +54,20 @@
                     }
                 }
             ]
-        })
-
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
     })
+    return response
+    }
+
+    function addRow(table,data1,data2){
+            var newRow = table.insertRow()
+            var firstCell = newRow.insertCell()
+            var secondCell = newRow.insertCell()
+            firstCell.innerHTML = data1
+            secondCell.innerHTML = data2
     }
 
 
