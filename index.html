@@ -1,80 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="style.css" />
 
 </head>
-<body>
+
+<body style="background-color: grey;">
     <h1 class="title">SpinPrirucnik</h1>
 
-    <table id="tablica">
+    <form>
+        <label for="fname">Name</label><br><br>
+        <input class="name center" type="text" id="nameInput" name="fname"><br><br>
+        <label for="lname">Description</label><br><br>
+        <input class="description" type="text" id="descriptionInput" name="lname"><br><br>
+    </form>
+    <div class="center">
+        <button type="button" onclick="onSubmitForm()">Submit</button>
+    </div>
+    <div id="errorText" class="center errorText"></div>
+
+    <table id="tablica" class="table center">
         <tr>
-          <th>Month</th>
-          <th>Savings</th>
+            <th class="table">Month</th>
+            <th class="table">Savings</th>
         </tr>
         <tr>
-          <td>January</td>
-          <td>$100</td>
+            <td class="table">January</td>
+            <td class="table">$100</td>
         </tr>
-      </table>
+    </table>
 </body>
 
 <script>
     var test = 25
-    addTable()
     var url = "https://jupitermobiletest.jupiter-software.com:30081/jupitermobilex/gen/api/food"
-    
-    fetchData().then(function (response){
-       if(response.ok)
+
+    fetchData().then(function (response) {
+        if (response.ok)
             return response.json()
-    }).then(function (dataList){
+    }).then(function (dataList) {
 
         console.log(dataList)
-        document.getElementsByClassName("title")
-        var table = document.getElementById("tablica")     
-        for(var i = 0;i < Object.keys(dataList).length;i++){
-            addRow(table,dataList[i]["Term"],dataList[i]["Username"])
+        var table = document.getElementById("tablica")
+        for (var i = 0; i < Object.keys(dataList).length; i++) {
+            addRow(table, dataList[i]["Term"], dataList[i]["Description"])
         }
-            
+
+    }).catch(function (reason) {
+        console.log("failed to get data")
+
     })
-   
-    async function fetchData(){
-        var response = await fetch(url,{
-        method : "POST",
-        body: JSON.stringify({
-            "queries" : [
-                {
-                    "query":"SpinCodeAcademy",
-                    "params" : {
-                        "action" : "getall",
-                        "userid" : 1
+
+    function onSubmitForm() {
+        var nameInput = document.getElementById("nameInput")
+        var descriptionInput = document.getElementById("descriptionInput")
+        console.log(nameInput)
+        console.log(descriptionInput)
+        if (FormValidator.isValid(nameInput, descriptionInput))
+            onValidForm(nameInput.value,descriptionInput.value)
+        else
+            onInvalidForm()
+
+    }
+
+    function onValidForm(name,description) {
+        console.log("Valid form")
+        var errorText = document.getElementById("errorText")
+        errorText.style.display = "none";
+        insertData(name,description).then(function (response) {
+             if (!response.ok)
+                return 
+            var table = document.getElementById("tablica")
+            addRow(table,name,description)
+                
+        })
+    }
+
+    function onInvalidForm() {
+        console.log("JOK form")
+        var errorText = document.getElementById("errorText")
+        errorText.style.display = "block"; 
+        errorText.innerHTML = "Form must be valid !"
+    }
+
+
+    async function insertData(name, description) {
+        console.log(`name -> ${name}, description -> ${description}`)
+        var response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                "queries": [
+                    {
+                        "query": "SpinCodeAcademy",
+                        "params": {
+                            "action": "insert",
+                            "userid": 1,
+                            "term": name,
+                            "description": description
+                        }
                     }
-                }
-            ]
-        }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    })
-    return response
+                ]
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        return response
     }
 
-    function addRow(table,data1,data2){
-            var newRow = table.insertRow()
-            var firstCell = newRow.insertCell()
-            var secondCell = newRow.insertCell()
+    async function fetchData() {
+        var response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                "queries": [
+                    {
+                        "query": "SpinCodeAcademy",
+                        "params": {
+                            "action": "getall",
+                            "userid": 1
+                        }
+                    }
+                ]
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        return response
+    }
+
+    function addRow(table, data1, data2) {
+        var newRow = table.insertRow()
+        var firstCell = newRow.insertCell()
+        var secondCell = newRow.insertCell()
+        if(data1 == null || data1 == undefined || data1 == "")
+            firstCell.innerHTML = "-"
+        else    
             firstCell.innerHTML = data1
+        if(data2 == null || data2 == undefined || data2 == "")
+            secondCell.innerHTML = "-"
+        else    
             secondCell.innerHTML = data2
+        firstCell.style.border = "1px solid"
+        secondCell.style.border = "1px solid"
+
     }
 
-
-
-    
-
-    function addTable (){
+    function addTable() {
         document.getElementsByClassName("title")
         var table = document.getElementById("tablica")
         var row = table.insertRow()
@@ -87,5 +163,24 @@
         cell3.innerHTML = "Smth3"
         cell4.innerHTML = "Smth4"
     }
+
+
+    class FormValidator {
+        static isValid(nameInput, descritpionInput) {
+            if (
+                nameInput.value == undefined ||
+                nameInput.value == null ||
+                nameInput.value == "" ||
+                descritpionInput.value == undefined ||
+                descritpionInput.value == null ||
+                descritpionInput.value == ""
+            )
+                return false;
+            else
+                return true;
+        }
+    }
+
 </script>
+
 </html>
